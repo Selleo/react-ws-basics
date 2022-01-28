@@ -6,20 +6,26 @@ import { Navbar } from '../Navbar';
 
 const navbarLinks = [
   {
-    name: 'Channels',
+    name: 'SignIn',
     path: paths.root,
   },
   {
     name: 'Posts',
     path: paths.posts,
   },
+  {
+    name: 'Channels',
+    path: paths.channels,
+  },
 ];
 
 export const PageLayout = () => {
   return (
-    <div>
+    <>
       <Navbar links={navbarLinks} />
-      <Outlet />
-    </div>
+      <main className="flex-auto pt-16">
+        <Outlet />
+      </main>
+    </>
   );
 };
