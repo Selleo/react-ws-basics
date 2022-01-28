@@ -13,6 +13,10 @@ const navbarLinks = [
     name: 'Posts',
     path: paths.posts,
   },
+  {
+    name: 'Channels',
+    path: paths.channels,
+  },
 ];
 
 export const PageLayout = () => {
