@@ -26,7 +26,7 @@ wsServer.on('connection', (ws) => {
 
         wsServer.clients.forEach((client) => {
           if (
-            client.channelId === payload.channelId &&
+            client?.channelId === payload.channelId &&
             client.readyState === WebSocket.OPEN
           ) {
             client.send(
