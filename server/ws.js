@@ -55,6 +55,26 @@ wsServer.on('connection', (ws) => {
         messageId = undefined;
         break;
       }
+      case 'typing': {
+        wsServer.clients.forEach((client) => {
+          if (
+            client !== ws &&
+            client?.channelId === payload.channelId &&
+            client.readyState === WebSocket.OPEN
+          ) {
+            client.send(
+              JSON.stringify({
+                type: 'typing',
+                payload: {
+                  username: payload.username,
+                },
+              })
+            );
+          }
+        });
+
+        break;
+      }
       case 'incrementLike': {
         wsServer.clients.forEach((client) => {
           if (
