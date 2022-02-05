@@ -15,8 +15,12 @@ wsServer.on('connection', (ws) => {
 
     switch (type) {
       case 'connect': {
-        if (payload.channelId) {
+        if (payload?.channelId) {
           ws.channelId = payload.channelId;
+        }
+
+        if (payload?.postId) {
+          ws.postId = payload.postId;
         }
 
         break;
@@ -49,6 +53,30 @@ wsServer.on('connection', (ws) => {
         });
 
         messageId = undefined;
+        break;
+      }
+      case 'incrementLike': {
+        wsServer.clients.forEach((client) => {
+          if (
+            client?.postId === payload.post.id &&
+            client.readyState === WebSocket.OPEN
+          ) {
+            client.send(
+              JSON.stringify({
+                type: 'postLike',
+                payload: {
+                  likes: payload.post.likes + 1,
+                },
+              })
+            );
+          }
+        });
+
+        apiClient.put(`/posts/${payload.post.id}`, {
+          ...payload.post,
+          likes: payload.post.likes + 1,
+        });
+
         break;
       }
       default: {
