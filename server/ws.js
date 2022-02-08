@@ -83,7 +83,7 @@ wsServer.on('connection', (ws) => {
           ) {
             client.send(
               JSON.stringify({
-                type: 'postLike',
+                type: 'incrementLike',
                 payload: {
                   likes: payload.post.likes + 1,
                 },
