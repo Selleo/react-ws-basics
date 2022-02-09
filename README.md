@@ -39,7 +39,7 @@ type Post = {
 }
 ```
 
-### Chat
+### Chat message
 
 - onOpen
   - type: 'connect'
@@ -66,3 +66,17 @@ type Post = {
 - onMessage
   - type: 'incrementLike'
   - payload: Post
+
+### Chat typing
+
+- onOpen
+  - type: 'connect'
+  - payload: { channelId: number }
+
+- send
+  - type: 'typing'
+  - payload: { channelId: number, username: string }
+
+- onMessage
+  - type: 'typing'
+  - payload: { username: string }
