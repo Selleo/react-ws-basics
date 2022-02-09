@@ -1,6 +1,6 @@
 import { isArray } from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocalStorage } from 'react-use';
+import { useInterval, useLocalStorage } from 'react-use';
 
 import { useGetChannelMessages } from '../../api/chennels';
 import { Card } from '../../components';
@@ -11,6 +11,24 @@ export const Chat = ({ channelId }) => {
   const [username] = useLocalStorage('username');
   const [messages, setMessages] = useState([]);
   const wsRef = useRef(null);
+
+  const [counter, setCounter] = useState(0);
+  const [isCounterRunning, setIsCounterRunning] = useState(false);
+  const [typingUsername, setTypingUsername] = useState('');
+
+  useInterval(
+    () => {
+      const counterNewValue = counter + 1;
+      setCounter(counterNewValue);
+
+      if (counterNewValue % 4 === 0) {
+        setCounter(0);
+        setTypingUsername('');
+        setIsCounterRunning(false);
+      }
+    },
+    isCounterRunning ? 1000 : null
+  );
 
   const sendMessage = useCallback(
     ({ message }) => {
@@ -27,6 +45,18 @@ export const Chat = ({ channelId }) => {
     },
     [channelId, username, wsRef]
   );
+
+  const sendTypingMessage = useCallback(() => {
+    wsRef.current.send(
+      JSON.stringify({
+        type: 'typing',
+        payload: {
+          username,
+          channelId,
+        },
+      })
+    );
+  }, [channelId, username, wsRef]);
 
   useEffect(() => {
     if (isArray(data?.messages)) {
@@ -58,6 +88,11 @@ export const Chat = ({ channelId }) => {
           setMessages((prevValue) => [...prevValue, payload]);
           break;
         }
+        case 'typing': {
+          setTypingUsername(payload.username);
+          setIsCounterRunning(true);
+          break;
+        }
         default: {
           console.log(`Unknown response type: ${type}`);
           break;
@@ -75,8 +110,9 @@ export const Chat = ({ channelId }) => {
 
   return (
     <div className="flex flex-col items-center">
+      {isCounterRunning && <div>{typingUsername} is typing</div>}
       <div>
-        <ChatForm onSubmit={sendMessage} />
+        <ChatForm onSubmit={sendMessage} onMessageChange={sendTypingMessage} />
       </div>
       {messages.map((message, index) => (
         <Card key={index}>
