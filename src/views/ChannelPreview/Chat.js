@@ -1,6 +1,6 @@
 import { isArray } from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocalStorage } from 'react-use';
+import { useInterval, useLocalStorage } from 'react-use';
 
 import { useGetChannelMessages } from '../../api/chennels';
 import { Card } from '../../components';
@@ -12,6 +12,36 @@ export const Chat = ({ channelId }) => {
   const [messages, setMessages] = useState([]);
   const wsRef = useRef(null);
   const containerRef = useRef(null);
+
+  const [counter, setCounter] = useState(0);
+  const [isCounterRunning, setIsCounterRunning] = useState(false);
+  const [typingUsername, setTypingUsername] = useState('');
+
+  useInterval(
+    () => {
+      const conterNewValue = counter + 1;
+      setCounter(conterNewValue);
+
+      if (conterNewValue % 4 === 0) {
+        setCounter(0);
+        setTypingUsername('');
+        setIsCounterRunning(false);
+      }
+    },
+    isCounterRunning ? 1000 : null
+  );
+
+  const handleMessageChange = useCallback(() => {
+    wsRef.current.send(
+      JSON.stringify({
+        type: 'typing',
+        payload: {
+          username,
+          channelId,
+        },
+      })
+    );
+  }, [username, channelId]);
 
   const sendMessage = useCallback(
     ({ message }) => {
@@ -59,6 +89,11 @@ export const Chat = ({ channelId }) => {
           containerRef.current.scrollTop = containerRef.current.scrollHeight;
           break;
         }
+        case 'typing': {
+          setIsCounterRunning(true);
+          setTypingUsername(payload.username);
+          break;
+        }
         default: {
           console.warn(`Unknown action type: ${type}`);
           break;
@@ -82,7 +117,11 @@ export const Chat = ({ channelId }) => {
       </div>
 
       <div>
-        <ChatForm onSubmit={sendMessage} />
+        <div>{isCounterRunning && <span>{typingUsername} is typing</span>}</div>
+        <ChatForm
+          onSubmit={sendMessage}
+          onMessageChange={handleMessageChange}
+        />
       </div>
     </div>
   );
