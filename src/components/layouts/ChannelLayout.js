@@ -10,7 +10,7 @@ export const ChannelLayout = () => {
   const { pathname } = useLocation();
 
   return (
-    <div className="max-w-4xl m-auto px-2 sm:px-6 lg:px-8">
+    <div className="max-w-4xl m-auto px-2 sm:px-6 h-full lg:px-8">
       {!!data && (
         <div className="flex justify-center py-4">
           {data.channels.map((channel, index) => (
@@ -29,7 +29,7 @@ export const ChannelLayout = () => {
         </div>
       )}
 
-      <div>
+      <div className="h-full">
         <Outlet />
       </div>
     </div>
