@@ -21,11 +21,11 @@ const navbarLinks = [
 
 export const PageLayout = () => {
   return (
-    <>
+    <div className="h-screen">
       <Navbar links={navbarLinks} />
-      <main className="flex-auto pt-16">
+      <main className="flex-auto h-full pt-16">
         <Outlet />
       </main>
-    </>
+    </div>
   );
 };

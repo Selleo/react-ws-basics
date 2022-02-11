@@ -9,7 +9,7 @@ export const ChannelPreview = () => {
   const [usernameKey] = useLocalStorage('username');
 
   return (
-    <div className="py-4">
+    <div className="py-4 h-full">
       {!!usernameKey && <Chat channelId={channelId} />}
     </div>
   );
